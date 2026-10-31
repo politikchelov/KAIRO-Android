@@ -1,0 +1,61 @@
+name: Build KAIRO APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Generate Android platform
+        run: flutter create . --platforms=android --org com.kairo.app --project-name kairo_android
+
+      - name: Add internet permission
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("android/app/src/main/AndroidManifest.xml")
+          s = p.read_text()
+          marker = '<manifest '
+          i = s.find('>', s.find(marker))
+          if i < 0:
+              raise SystemExit("Android manifest root tag not found")
+          permission = '\n    <uses-permission android:name="android.permission.INTERNET" />'
+          if "android.permission.INTERNET" not in s:
+              s = s[:i + 1] + permission + s[i + 1:]
+          p.write_text(s)
+          PY
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build release APK
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: KAIRO-Android
+          path: build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
+          retention-days: 14
