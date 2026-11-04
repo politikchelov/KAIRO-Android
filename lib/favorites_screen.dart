@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'favorites_store.dart';
 
-const _favPink = Color(0xFFE34BFF);
-const _favPanel = Color(0xFF171021);
+const _favPink = Color(0xFFEF7166);
+const _favPanel = Color(0xFFFFFFFF);
 
 class FavoritesScreen extends StatefulWidget {
   const FavoritesScreen({super.key, required this.onOpenAnime});
@@ -41,7 +41,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             SizedBox(height: 14),
             Center(child: Text('Пока ничего нет', style: TextStyle(fontSize: 19, fontWeight: FontWeight.w800))),
             SizedBox(height: 7),
-            Center(child: Text('Добавляй аниме в избранное на странице тайтла.', style: TextStyle(color: Color(0xFFB6A8C5)), textAlign: TextAlign.center)),
+            Center(child: Text('Добавляй аниме в избранное на странице тайтла.', style: TextStyle(color: Color(0xFF927A75)), textAlign: TextAlign.center)),
           ])
         : ListView.separated(
             padding: const EdgeInsets.all(16),
@@ -66,7 +66,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                   ),
                   title: Text(item.title, maxLines: 2, overflow: TextOverflow.ellipsis,
                     style: const TextStyle(fontWeight: FontWeight.w800)),
-                  subtitle: const Text('Открыть страницу аниме', style: TextStyle(color: Color(0xFFB6A8C5))),
+                  subtitle: const Text('Открыть страницу аниме', style: TextStyle(color: Color(0xFF927A75))),
                   trailing: IconButton(
                     tooltip: 'Убрать из избранного',
                     icon: const Icon(Icons.favorite, color: _favPink),
