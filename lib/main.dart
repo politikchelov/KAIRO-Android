@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'anime_catalog.dart';
 import 'anime_detail.dart';
 import 'favorites_screen.dart';
+import 'history_screen.dart';
 
 const _bg = Color(0xFFFFF3F0);
 const _surface = Color(0xFFFFFFFF);
@@ -92,7 +93,7 @@ class _KairoShellState extends State<KairoShell> {
   @override
   Widget build(BuildContext context) {
     final pages = <Widget>[
-      _HomeScreen(onOpenCatalog: () => setState(() => _index = 1)),
+      _HomeScreen(onOpenCatalog: () => setState(() => _index = 1), onOpenHistory: _openHistory),
       AnimeCatalogScreen(onOpenAnime: _openAnime),
       const ChatScreen(),
       FavoritesScreen(onOpenAnime: _openAnime),
@@ -142,7 +143,7 @@ class _KairoShellState extends State<KairoShell> {
     );
   }
 
-  void _openAnime(String id) {
+  void _openHistory() {\n    Navigator.of(context).push(MaterialPageRoute(builder: (_) => HistoryScreen(onOpenAnime: _openAnime)));\n  }\n\n  void _openAnime(String id) {
     Navigator.of(context).push(MaterialPageRoute(
       builder: (_) => AnimeDetailScreen(animeId: id),
     ));
@@ -212,7 +213,7 @@ class _HomeScreen extends StatelessWidget {
         Expanded(child: _HomeFeature(icon: Icons.auto_awesome_rounded, title: 'Новинки', subtitle: 'Свежие тайтлы', onTap: onOpenCatalog)),
       ]),
       const SizedBox(height: 12),
-      _HomeAction(icon: Icons.grid_view_rounded, title: 'Открыть каталог', subtitle: 'Поиск, жанры и подбор аниме', onTap: onOpenCatalog),
+      _HomeAction(icon: Icons.grid_view_rounded, title: 'Открыть каталог', subtitle: 'Поиск, жанры и подбор аниме', onTap: onOpenCatalog),\n      const SizedBox(height: 10),\n      _HomeAction(icon: Icons.history_rounded, title: 'История просмотров', subtitle: 'Продолжи знакомство с недавно открытыми тайтлами', onTap: onOpenHistory),
     ],
   );
 }
