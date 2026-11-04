@@ -46,6 +46,24 @@ jobs:
           p.write_text(s)
           PY
 
+      - name: Configure Supabase OAuth deep link
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("android/app/src/main/AndroidManifest.xml")
+          s = p.read_text()
+          callback = """              <intent-filter>
+                  <action android:name="android.intent.action.VIEW" />
+                  <category android:name="android.intent.category.DEFAULT" />
+                  <category android:name="android.intent.category.BROWSABLE" />
+                  <data android:scheme="com.kairo.app.kairo_android" android:host="login-callback" />
+              </intent-filter>
+          """
+          if "com.kairo.app.kairo_android" not in s:
+              s = s.replace("</activity>", callback + "\\n        </activity>", 1)
+          p.write_text(s)
+          PY
+
       - name: Install dependencies
         run: flutter pub get
 
