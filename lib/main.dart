@@ -1,4 +1,10 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'kairo_backend.dart';
+import 'auth_screen.dart';
+import 'chat_screen.dart';
+import 'profile_screen.dart';
 import 'package:flutter/services.dart';
 import 'anime_catalog.dart';
 import 'anime_detail.dart';
@@ -9,8 +15,9 @@ const _surface = Color(0xFF171021);
 const _purple = Color(0xFF8B20F5);
 const _pink = Color(0xFFE34BFF);
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Supabase.initialize(url: kairoSupabaseUrl, anonKey: kairoSupabaseKey);
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.light,
@@ -20,8 +27,30 @@ void main() {
   runApp(const KairoApp());
 }
 
-class KairoApp extends StatelessWidget {
+class KairoApp extends StatefulWidget {
   const KairoApp({super.key});
+  @override
+  State<KairoApp> createState() => _KairoAppState();
+}
+
+class _KairoAppState extends State<KairoApp> {
+  StreamSubscription<AuthState>? _authSubscription;
+  Session? _session;
+
+  @override
+  void initState() {
+    super.initState();
+    _session = kairoSupabase.auth.currentSession;
+    _authSubscription = kairoSupabase.auth.onAuthStateChange.listen((state) {
+      if (mounted) setState(() => _session = state.session);
+    });
+  }
+
+  @override
+  void dispose() {
+    _authSubscription?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) => MaterialApp(
@@ -33,7 +62,7 @@ class KairoApp extends StatelessWidget {
       colorScheme: ColorScheme.fromSeed(seedColor: _purple, brightness: Brightness.dark, surface: _surface),
       useMaterial3: true,
     ),
-    home: const KairoShell(),
+    home: _session == null ? const AuthScreen() : const KairoShell(),
   );
 }
 
@@ -65,11 +94,9 @@ class _KairoShellState extends State<KairoShell> {
     final pages = <Widget>[
       _HomeScreen(onOpenCatalog: () => setState(() => _index = 1)),
       AnimeCatalogScreen(onOpenAnime: _openAnime),
-      const _ComingSoonScreen(title: 'Чат', icon: Icons.forum_rounded,
-        subtitle: 'Общение KAIRO появится здесь. Это отдельный экран приложения.'),
+      const ChatScreen(),
       FavoritesScreen(onOpenAnime: _openAnime),
-      const _ComingSoonScreen(title: 'Профиль', icon: Icons.person_rounded,
-        subtitle: 'Здесь будут авторизация, профиль, KC и коллекция карточек.'),
+      const ProfileScreen(),
     ];
 
     return PopScope(
