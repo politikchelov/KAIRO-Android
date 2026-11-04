@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'anime_catalog.dart';
+import 'anime_detail.dart';
 
 const _bg = Color(0xFF090611);
 const _surface = Color(0xFF171021);
@@ -116,7 +117,7 @@ class _KairoShellState extends State<KairoShell> {
 
   void _openAnime(String id) {
     Navigator.of(context).push(MaterialPageRoute(
-      builder: (_) => _AnimeDetailScreen(animeId: id),
+      builder: (_) => AnimeDetailScreen(animeId: id),
     ));
   }
 }
@@ -253,27 +254,3 @@ class _ComingSoonScreen extends StatelessWidget {
   );
 }
 
-class _AnimeDetailScreen extends StatelessWidget {
-  const _AnimeDetailScreen({required this.animeId});
-  final String animeId;
-
-  @override
-  Widget build(BuildContext context) => Scaffold(
-    backgroundColor: _bg,
-    appBar: AppBar(backgroundColor: _bg, title: const Text('Аниме')),
-    body: Center(child: Padding(
-      padding: const EdgeInsets.all(28),
-      child: Column(mainAxisSize: MainAxisSize.min, children: [
-        const Icon(Icons.movie_creation_outlined, color: _pink, size: 48),
-        const SizedBox(height: 14),
-        const Text('Страница аниме готовится',
-          style: TextStyle(fontSize: 19, fontWeight: FontWeight.w800)),
-        const SizedBox(height: 8),
-        const Text('Следующим этапом подключим описание, список серий и отдельный видеоплеер.',
-          textAlign: TextAlign.center, style: TextStyle(color: Color(0xFFB6A8C5), height: 1.4)),
-        const SizedBox(height: 10),
-        Text('ID: $animeId', style: const TextStyle(color: Color(0xFF887A99), fontSize: 11)),
-      ]),
-    )),
-  );
-}
