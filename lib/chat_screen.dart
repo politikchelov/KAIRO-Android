@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'kairo_backend.dart';
 
 const _chatPink = Color(0xFFEF7166);
@@ -101,7 +102,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   decoration: BoxDecoration(
                     color: mine ? const Color(0xFFFFDED8) : _chatPanel,
                     borderRadius: BorderRadius.circular(15),
-                    border: Border.all(color: mine ? const Color(0x668B20F5) : const Color(0x221FFFFFFF)),
+                    border: Border.all(color: mine ? const Color(0x66EF7166) : const Color(0x221FFFFFFF)),
                   ),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Row(mainAxisSize: MainAxisSize.min, children: [
