@@ -10,19 +10,19 @@ import 'anime_catalog.dart';
 import 'anime_detail.dart';
 import 'favorites_screen.dart';
 
-const _bg = Color(0xFF090611);
-const _surface = Color(0xFF171021);
-const _purple = Color(0xFF8B20F5);
-const _pink = Color(0xFFE34BFF);
+const _bg = Color(0xFFFFF3F0);
+const _surface = Color(0xFFFFFFFF);
+const _purple = Color(0xFFEF7166);
+const _pink = Color(0xFFEF7166);
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Supabase.initialize(url: kairoSupabaseUrl, anonKey: kairoSupabaseKey);
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.light,
+    statusBarIconBrightness: Brightness.dark,
     systemNavigationBarColor: _bg,
-    systemNavigationBarIconBrightness: Brightness.light,
+    systemNavigationBarIconBrightness: Brightness.dark,
   ));
   runApp(const KairoApp());
 }
@@ -57,9 +57,9 @@ class _KairoAppState extends State<KairoApp> {
     title: 'KAIRO',
     debugShowCheckedModeBanner: false,
     theme: ThemeData(
-      brightness: Brightness.dark,
+      brightness: Brightness.light,
       scaffoldBackgroundColor: _bg,
-      colorScheme: ColorScheme.fromSeed(seedColor: _purple, brightness: Brightness.dark, surface: _surface),
+      colorScheme: ColorScheme.fromSeed(seedColor: _purple, brightness: Brightness.light, surface: _surface),
       useMaterial3: true,
     ),
     home: _session == null ? const AuthScreen() : const KairoShell(),
@@ -113,10 +113,10 @@ class _KairoShellState extends State<KairoShell> {
           titleSpacing: 18,
           title: ShaderMask(
             shaderCallback: (bounds) => const LinearGradient(
-              colors: [_pink, _purple, Color(0xFFB7A0FF)],
+              colors: [_pink, _purple, Color(0xFFFFA79E)],
             ).createShader(bounds),
             child: const Text('KAIRO✦', style: TextStyle(
-              color: Colors.white, fontWeight: FontWeight.w900,
+              color: const Color(0xFF30201D), fontWeight: FontWeight.w900,
               letterSpacing: 1.5, fontSize: 23,
             )),
           ),
@@ -132,8 +132,8 @@ class _KairoShellState extends State<KairoShell> {
         body: IndexedStack(index: _index, children: pages),
         bottomNavigationBar: NavigationBar(
           height: 68,
-          backgroundColor: const Color(0xFF100B19),
-          indicatorColor: _purple.withValues(alpha: .22),
+          backgroundColor: const Color(0xFFFFE7E2),
+          indicatorColor: const Color(0xFFFFD5CE),
           selectedIndex: _index,
           onDestinationSelected: (value) => setState(() => _index = value),
           destinations: _destinations,
@@ -155,51 +155,87 @@ class _HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ListView(
-    padding: const EdgeInsets.fromLTRB(18, 18, 18, 32),
+    padding: const EdgeInsets.fromLTRB(18, 14, 18, 30),
     children: [
-      const Text('ТВОЯ АНИМЕ-ВСЕЛЕННАЯ',
-        style: TextStyle(color: _pink, fontSize: 10, letterSpacing: 2, fontWeight: FontWeight.w800)),
-      const SizedBox(height: 8),
-      const Text('Добро пожаловать в KAIRO',
-        style: TextStyle(fontSize: 27, height: 1.12, fontWeight: FontWeight.w900)),
+      Row(children: [
+        const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('KAIRO ANIME CLUB', style: TextStyle(color: Color(0xFFB94842), fontSize: 10, letterSpacing: 2, fontWeight: FontWeight.w900)),
+          SizedBox(height: 4),
+          Text('Привет, анимешник!', style: TextStyle(color: Color(0xFF30201D), fontSize: 23, fontWeight: FontWeight.w900)),
+        ])),
+        CircleAvatar(radius: 23, backgroundColor: Color(0xFFFFD8D1),
+          child: Icon(Icons.person_rounded, color: Color(0xFFB94842))),
+      ]),
       const SizedBox(height: 18),
       Container(
-        padding: const EdgeInsets.all(20),
+        height: 310,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(22),
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft, end: Alignment.bottomRight,
-            colors: [Color(0xFF47206B), Color(0xFF1D1230), Color(0xFF110B1B)],
-          ),
-          border: Border.all(color: const Color(0x557C42B8)),
+          borderRadius: BorderRadius.circular(28),
+          gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight,
+            colors: [Color(0xFFFF766B), Color(0xFFFFA99F), Color(0xFFFFD4CC)]),
+          boxShadow: const [BoxShadow(color: Color(0x33B94842), blurRadius: 24, offset: Offset(0, 14))],
         ),
-        child: const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('KAIRO ORIGINAL', style: TextStyle(color: Color(0xFFFFB6FF), fontSize: 10, letterSpacing: 2, fontWeight: FontWeight.w800)),
-          SizedBox(height: 12),
-          Text('Истории, в которые хочется возвращаться.',
-            style: TextStyle(fontSize: 23, height: 1.15, fontWeight: FontWeight.w900)),
-          SizedBox(height: 10),
-          Text('Исследуй каталог и открывай новые миры.',
-            style: TextStyle(color: Color(0xFFD4C5E3), height: 1.4)),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(children: [
+          Positioned(right: -45, top: -55, child: Container(width: 230, height: 230,
+            decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Color(0x55FFFFFF), width: 3)))),
+          Positioned(right: 18, bottom: -85, child: Container(width: 250, height: 250,
+            decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Color(0x66FFFFFF), width: 3)))),
+          Positioned(left: 18, top: 18, child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24)),
+            child: const Text('100+ АНИМЕ ✦', style: TextStyle(color: Color(0xFF30201D), fontWeight: FontWeight.w900, fontSize: 11)))),
+          Positioned(left: 20, right: 18, bottom: 22, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Text('ТВОЯ СЛЕДУЮЩАЯ\nАНИМЕ-ИСТОРИЯ', style: TextStyle(color: Colors.white, fontSize: 27, height: 1.02, fontWeight: FontWeight.w900)),
+            const SizedBox(height: 10),
+            const Text('Открывай новые миры и находи любимые тайтлы', style: TextStyle(color: Color(0xFFFFF8F6), fontSize: 12, height: 1.4)),
+            const SizedBox(height: 15),
+            FilledButton.icon(
+              onPressed: onOpenCatalog,
+              icon: const Icon(Icons.play_arrow_rounded),
+              label: const Text('Смотреть аниме'),
+              style: FilledButton.styleFrom(backgroundColor: Colors.white, foregroundColor: const Color(0xFFB94842),
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12)),
+            ),
+          ])),
         ]),
       ),
-      const SizedBox(height: 24),
-      const Text('ТВОЙ СЛЕДУЮЩИЙ ШАГ',
-        style: TextStyle(color: Color(0xFFB9A9CA), fontSize: 11, letterSpacing: 1.4, fontWeight: FontWeight.w800)),
-      const SizedBox(height: 10),
-      _HomeAction(
-        icon: Icons.grid_view_rounded,
-        title: 'Открыть каталог',
-        subtitle: 'Поиск и подбор аниме',
-        onTap: onOpenCatalog,
-      ),
-      const SizedBox(height: 10),
-      const _InfoTile(
-        icon: Icons.construction_rounded,
-        title: 'Приложение развивается',
-        subtitle: 'Новые нативные разделы будут добавляться поэтапно.',
-      ),
+      const SizedBox(height: 25),
+      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+        const Text('ОТКРЫВАЙ НОВОЕ', style: TextStyle(color: Color(0xFF30201D), fontSize: 15, fontWeight: FontWeight.w900, letterSpacing: .5)),
+        TextButton(onPressed: onOpenCatalog, child: const Text('Весь каталог')),
+      ]),
+      const SizedBox(height: 8),
+      Row(children: [
+        Expanded(child: _HomeFeature(icon: Icons.local_fire_department_rounded, title: 'Популярное', subtitle: 'Что сейчас смотрят', onTap: onOpenCatalog)),
+        const SizedBox(width: 10),
+        Expanded(child: _HomeFeature(icon: Icons.auto_awesome_rounded, title: 'Новинки', subtitle: 'Свежие тайтлы', onTap: onOpenCatalog)),
+      ]),
+      const SizedBox(height: 12),
+      _HomeAction(icon: Icons.grid_view_rounded, title: 'Открыть каталог', subtitle: 'Поиск, жанры и подбор аниме', onTap: onOpenCatalog),
     ],
+  );
+}
+
+class _HomeFeature extends StatelessWidget {
+  const _HomeFeature({required this.icon, required this.title, required this.subtitle, required this.onTap});
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) => Material(
+    color: Colors.white, borderRadius: BorderRadius.circular(18),
+    child: InkWell(onTap: onTap, borderRadius: BorderRadius.circular(18),
+      child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Container(width: 38, height: 38, decoration: BoxDecoration(color: const Color(0xFFFFE3DE), borderRadius: BorderRadius.circular(12)),
+          child: Icon(icon, color: const Color(0xFFB94842))),
+        const SizedBox(height: 12),
+        Text(title, style: const TextStyle(color: Color(0xFF30201D), fontWeight: FontWeight.w900)),
+        const SizedBox(height: 3),
+        Text(subtitle, style: const TextStyle(color: Color(0xFF927A75), fontSize: 11)),
+      ])),
+    ),
   );
 }
 
@@ -225,7 +261,7 @@ class _HomeAction extends StatelessWidget {
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
             const SizedBox(height: 3),
-            Text(subtitle, style: const TextStyle(color: Color(0xFFB6A8C5), fontSize: 12)),
+            Text(subtitle, style: const TextStyle(color: Color(0xFF927A75), fontSize: 12)),
           ])),
           const Icon(Icons.chevron_right_rounded, color: Color(0xFFB6A8C5)),
         ]),
@@ -243,7 +279,7 @@ class _InfoTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(15),
-    decoration: BoxDecoration(color: const Color(0xFF120D1B), borderRadius: BorderRadius.circular(16)),
+    decoration: BoxDecoration(color: const Color(0xFFFFE7E2), borderRadius: BorderRadius.circular(16)),
     child: Row(children: [
       Icon(icon, color: _pink),
       const SizedBox(width: 12),
