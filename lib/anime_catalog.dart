@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-const _catalogBg = Color(0xFF090611);
-const _catalogCard = Color(0xFF171021);
-const _catalogPink = Color(0xFFE34BFF);
+const _catalogBg = Color(0xFFFFF3F0);
+const _catalogCard = Color(0xFFFFFFFF);
+const _catalogPink = Color(0xFFEF7166);
 
 class AnimeCatalogScreen extends StatefulWidget {
   const AnimeCatalogScreen({super.key, required this.onOpenAnime});
@@ -161,7 +161,7 @@ class _AnimeCatalogScreenState extends State<AnimeCatalogScreen> {
               ),
               const SizedBox(height:15),
               Text(_searchMode?'РЕЗУЛЬТАТЫ ПОИСКА':'ПОСЛЕДНИЕ ДОБАВЛЕНИЯ',
-                style:const TextStyle(fontSize:11,letterSpacing:1.4,color:Color(0xFFB9A9CA),fontWeight:FontWeight.w800)),
+                style:const TextStyle(fontSize:11,letterSpacing:1.4,color:Color(0xFF927A75),fontWeight:FontWeight.w800)),
             ]),
           )),
           if (_loading)
@@ -173,7 +173,7 @@ class _AnimeCatalogScreenState extends State<AnimeCatalogScreen> {
                 const SizedBox(height:14),
                 const Text('Каталог временно недоступен',style:TextStyle(fontSize:18,fontWeight:FontWeight.w800)),
                 const SizedBox(height:8),
-                Text(_error!,textAlign:TextAlign.center,style:const TextStyle(color:Color(0xFFB6A8C5))),
+                Text(_error!,textAlign:TextAlign.center,style:const TextStyle(color:Color(0xFF927A75))),
                 const SizedBox(height:16),
                 FilledButton(onPressed:()=>_load(query:_search.text.trim().length>=2?_search.text.trim():null),child:const Text('Повторить')),
               ]),
@@ -182,7 +182,7 @@ class _AnimeCatalogScreenState extends State<AnimeCatalogScreen> {
             const SliverFillRemaining(hasScrollBody:false,child:Center(child:Column(mainAxisSize:MainAxisSize.min,children:[
               Icon(Icons.search_off_rounded,color:_catalogPink,size:44),
               SizedBox(height:12),Text('Ничего не найдено',style:TextStyle(fontSize:18,fontWeight:FontWeight.w800)),
-              SizedBox(height:6),Text('Попробуй другое название',style:TextStyle(color:Color(0xFFB6A8C5))),
+              SizedBox(height:6),Text('Попробуй другое название',style:TextStyle(color:Color(0xFF927A75))),
             ])))
           else
             SliverPadding(padding:const EdgeInsets.fromLTRB(14,0,14,28),sliver:SliverGrid(
@@ -216,7 +216,7 @@ class _AnimeCatalogScreenState extends State<AnimeCatalogScreen> {
                           Text(title,maxLines:2,overflow:TextOverflow.ellipsis,
                             style:const TextStyle(fontSize:13,fontWeight:FontWeight.w800,height:1.2)),
                           if(year.isNotEmpty)Padding(padding:const EdgeInsets.only(top:4),
-                            child:Text(year,style:const TextStyle(fontSize:11,color:Color(0xFFB6A8C5)))),
+                            child:Text(year,style:const TextStyle(fontSize:11,color:Color(0xFF927A75)))),
                         ])),
                     ])),
                 );
@@ -232,5 +232,5 @@ class _PosterFallback extends StatelessWidget {
   const _PosterFallback();
   @override
   Widget build(BuildContext context)=>const ColoredBox(
-    color:Color(0xFF251633),child:Center(child:Icon(Icons.movie_creation_outlined,color:_catalogPink,size:34)));
+    color:Color(0xFFF5DAD5),child:Center(child:Icon(Icons.movie_creation_outlined,color:_catalogPink,size:34)));
 }
