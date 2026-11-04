@@ -177,8 +177,26 @@ class _AnimeCatalogScreenState extends State<AnimeCatalogScreen> {
                 ),
               ),
               const SizedBox(height:15),
-              Text(_searchMode?'РЕЗУЛЬТАТЫ ПОИСКА':'ПОСЛЕДНИЕ ДОБАВЛЕНИЯ',
-                style:const TextStyle(fontSize:11,letterSpacing:1.4,color:Color(0xFF927A75),fontWeight:FontWeight.w800)),
+              Row(children:[
+                Expanded(child:Text(_searchMode?'РЕЗУЛЬТАТЫ ПОИСКА':'ПОСЛЕДНИЕ ДОБАВЛЕНИЯ',
+                  style:const TextStyle(fontSize:11,letterSpacing:1.4,color:Color(0xFF927A75),fontWeight:FontWeight.w800))),
+                IconButton(tooltip:'Случайное аниме',onPressed:_items.isEmpty?null:(){
+                  final x=_items[Random().nextInt(_items.length)];
+                  widget.onOpenAnime((x['id']??x['anime_id']??x['animeId']).toString());
+                },icon:const Icon(Icons.shuffle_rounded,color:_catalogPink)),
+                IconButton(tooltip:_grid?'Список':'Сетка',onPressed:()=>setState(()=>_grid=!_grid),
+                  icon:Icon(_grid?Icons.view_list_rounded:Icons.grid_view_rounded,color:_catalogPink)),
+                PopupMenuButton<String>(tooltip:'Сортировка',onSelected:(v)=>setState(()=>_sort=v),
+                  icon:const Icon(Icons.sort_rounded,color:_catalogPink),
+                  itemBuilder:(_)=>const [PopupMenuItem(value:'По умолчанию',child:Text('По умолчанию')),PopupMenuItem(value:'По названию',child:Text('По названию')),PopupMenuItem(value:'По рейтингу',child:Text('По рейтингу'))]),
+              ]),
+              if(_items.isNotEmpty) ...[
+                const SizedBox(height:6),
+                SizedBox(height:36,child:ListView(scrollDirection:Axis.horizontal,children:[
+                  for(final g in ['Все',..._items.expand(_genres).toSet().take(12)])
+                    Padding(padding:const EdgeInsets.only(right:7),child:ChoiceChip(label:Text(g),selected:_genre==g,onSelected:(_)=>setState(()=>_genre=g),selectedColor:const Color(0xFFFFD5CE))),
+                ])),
+              ],
             ]),
           )),
           if (_loading)
@@ -206,7 +224,7 @@ class _AnimeCatalogScreenState extends State<AnimeCatalogScreen> {
               gridDelegate:const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount:2,mainAxisSpacing:14,crossAxisSpacing:12,childAspectRatio:.61),
               delegate:SliverChildBuilderDelegate((context,index){
-                final x=_items[index];
+                final x=_visibleItems[index];
                 final id=(x['id']??x['anime_id']??x['animeId']).toString();
                 final poster=_poster(x);
                 final title=_title(x);
