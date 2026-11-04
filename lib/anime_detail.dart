@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'favorites_store.dart';
 
 const _detailBg = Color(0xFF090611);
 const _detailPanel = Color(0xFF171021);
@@ -20,6 +21,8 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen> {
   bool _loading = true;
   String? _error;
   int? _selectedEpisode;
+  bool _isFavorite = false;
+  bool _favoriteBusy = false;
 
   Map<String, dynamic> _map(dynamic value) =>
       value is Map ? Map<String, dynamic>.from(value) : <String, dynamic>{};
@@ -88,6 +91,29 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen> {
   void initState() {
     super.initState();
     _load();
+    _loadFavorite();
+  }
+
+  Future<void> _loadFavorite() async {
+    final value = await FavoritesStore.contains(widget.animeId);
+    if (mounted) setState(() => _isFavorite = value);
+  }
+
+  Future<void> _toggleFavorite() async {
+    if (_favoriteBusy) return;
+    setState(() => _favoriteBusy = true);
+    final anime = _anime ?? {};
+    await FavoritesStore.toggle(FavoriteAnime(
+      id: widget.animeId,
+      title: _title(anime),
+      poster: _poster(anime),
+    ));
+    if (!mounted) return;
+    setState(() { _isFavorite = !_isFavorite; _favoriteBusy = false; });
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(_isFavorite ? 'Добавлено в избранное' : 'Убрано из избранного'),
+      duration: const Duration(seconds: 2),
+    ));
   }
 
   Future<void> _load() async {
@@ -144,6 +170,12 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen> {
       appBar: AppBar(
         backgroundColor: _detailBg,
         title: const Text('KAIRO / ANIME'),
+        actions: [IconButton(
+          tooltip: _isFavorite ? 'Убрать из избранного' : 'В избранное',
+          onPressed: _loading || _anime == null || _favoriteBusy ? null : _toggleFavorite,
+          icon: Icon(_isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+            color: _isFavorite ? _detailPink : Colors.white),
+        )],
       ),
       body: _loading
           ? const Center(child: CircularProgressIndicator(color: _detailPink))
