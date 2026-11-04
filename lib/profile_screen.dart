@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'kairo_backend.dart';
 
-const _profilePink = Color(0xFFE34BFF);
+const _profilePink = Color(0xFFEF7166);
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -51,9 +51,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           borderRadius: BorderRadius.circular(19),
           child: SizedBox(height: 150, child: Stack(fit: StackFit.expand, children: [
             if (banner.startsWith('http')) Image.network(banner, fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFF281638)))
+              errorBuilder: (_, __, ___) => const ColoredBox(color: Color(0xFFF2D8D3)))
             else const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(
-              colors: [Color(0xFF512078), Color(0xFF160D23)], begin: Alignment.topLeft, end: Alignment.bottomRight))),
+              colors: [Color(0xFFFF9C91), Color(0xFFE96D62)], begin: Alignment.topLeft, end: Alignment.bottomRight))),
             const DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(
               colors: [Colors.transparent, Color(0xAA090611)], begin: Alignment.topCenter, end: Alignment.bottomCenter))),
             Positioned(left: 16, bottom: 14, child: Text(name,
@@ -65,7 +65,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Row(children: [
             Container(
               width: 76, height: 76,
-              decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0xFF21152E),
+              decoration: BoxDecoration(shape: BoxShape.circle, color: const Color(0xFFFFE7E2),
                 border: Border.all(color: _profilePink, width: 3)),
               clipBehavior: Clip.antiAlias,
               child: avatar.startsWith('http')
@@ -76,12 +76,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Padding(padding: const EdgeInsets.only(top: 18), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(role.toUpperCase(), style: const TextStyle(color: _profilePink, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.2)),
               if ((p['badge'] ?? '').toString().isNotEmpty)
-                Text(p['badge'].toString(), style: const TextStyle(color: Color(0xFFFFC2FF), fontSize: 11)),
+                Text(p['badge'].toString(), style: const TextStyle(color: Color(0xFFB94842), fontSize: 11)),
             ])),
           ]),
         ),
         if (bio.isNotEmpty) Padding(padding: const EdgeInsets.only(bottom: 18),
-          child: Text(bio, style: const TextStyle(color: Color(0xFFD0C5DA), height: 1.45))),
+          child: Text(bio, style: const TextStyle(color: Color(0xFF765E59), height: 1.45))),
         _info('Статус', (p['status'] ?? '').toString().isEmpty ? 'Не указан' : p['status'].toString()),
         _info('Аккаунт', kairoSupabase.auth.currentUser?.email ?? 'KAIRO'),
         _info('Роль', role),
@@ -92,7 +92,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           },
           icon: const Icon(Icons.logout_rounded),
           label: const Text('Выйти из аккаунта'),
-          style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFFFF9AAE),
+          style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFFB94842),
             side: const BorderSide(color: Color(0x66FF718F)), padding: const EdgeInsets.symmetric(vertical: 14)),
         ),
       ]),
@@ -102,9 +102,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _info(String label, String value) => Container(
     margin: const EdgeInsets.only(bottom: 9),
     padding: const EdgeInsets.all(14),
-    decoration: BoxDecoration(color: const Color(0xFF171021), borderRadius: BorderRadius.circular(13)),
+    decoration: BoxDecoration(color: const Color(0xFFFFFFFF), borderRadius: BorderRadius.circular(13)),
     child: Row(children: [
-      SizedBox(width: 90, child: Text(label, style: const TextStyle(color: Color(0xFFB6A8C5), fontSize: 12))),
+      SizedBox(width: 90, child: Text(label, style: const TextStyle(color: Color(0xFF927A75), fontSize: 12))),
       Expanded(child: Text(value, style: const TextStyle(fontWeight: FontWeight.w700))),
     ]),
   );
