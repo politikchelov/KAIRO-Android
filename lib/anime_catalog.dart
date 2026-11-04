@@ -220,43 +220,42 @@ class _AnimeCatalogScreenState extends State<AnimeCatalogScreen> {
               SizedBox(height:6),Text('Попробуй другое название',style:TextStyle(color:Color(0xFF927A75))),
             ])))
           else
-            SliverPadding(padding:const EdgeInsets.fromLTRB(14,0,14,28),sliver:SliverGrid(
-              gridDelegate:const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount:2,mainAxisSpacing:14,crossAxisSpacing:12,childAspectRatio:.61),
-              delegate:SliverChildBuilderDelegate((context,index){
-                final x=_visibleItems[index];
-                final id=(x['id']??x['anime_id']??x['animeId']).toString();
-                final poster=_poster(x);
-                final title=_title(x);
-                final year=_string(x['year']??_map(x['aired'])['year']);
-                final score=_string(x['score']??x['rating']);
-                return Material(
-                  color:_catalogCard,borderRadius:BorderRadius.circular(15),clipBehavior:Clip.antiAlias,
-                  child:InkWell(onTap:()=>widget.onOpenAnime(id),child:Column(
-                    crossAxisAlignment:CrossAxisAlignment.start,children:[
-                      Expanded(child:Stack(fit:StackFit.expand,children:[
-                        if(poster.isNotEmpty) Image.network(poster,fit:BoxFit.cover,
-                          errorBuilder:(_,__,___)=>const _PosterFallback())
-                        else const _PosterFallback(),
-                        const DecoratedBox(decoration:BoxDecoration(gradient:LinearGradient(
-                          begin:Alignment.topCenter,end:Alignment.bottomCenter,
-                          colors:[Colors.transparent,Color(0x9906000D)]))),
-                        if(score.isNotEmpty)Positioned(top:8,right:8,child:DecoratedBox(
-                          decoration:BoxDecoration(color:const Color(0xCC100819),borderRadius:BorderRadius.circular(20)),
-                          child:Padding(padding:const EdgeInsets.symmetric(horizontal:8,vertical:5),
-                            child:Text('★ '+score,style:const TextStyle(fontSize:11,fontWeight:FontWeight.w800))))),
-                      ])),
-                      Padding(padding:const EdgeInsets.fromLTRB(10,9,10,10),child:Column(
-                        crossAxisAlignment:CrossAxisAlignment.start,children:[
-                          Text(title,maxLines:2,overflow:TextOverflow.ellipsis,
-                            style:const TextStyle(fontSize:13,fontWeight:FontWeight.w800,height:1.2)),
-                          if(year.isNotEmpty)Padding(padding:const EdgeInsets.only(top:4),
-                            child:Text(year,style:const TextStyle(fontSize:11,color:Color(0xFF927A75)))),
+            SliverPadding(padding:const EdgeInsets.fromLTRB(14,0,14,28),sliver:_grid
+              ? SliverGrid(
+                  gridDelegate:const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount:2,mainAxisSpacing:14,crossAxisSpacing:12,childAspectRatio:.61),
+                  delegate:SliverChildBuilderDelegate((context,index){
+                    final x=_visibleItems[index];
+                    final id=(x['id']??x['anime_id']??x['animeId']).toString();
+                    final poster=_poster(x), title=_title(x);
+                    final year=_string(x['year']??_map(x['aired'])['year']);
+                    final score=_string(x['score']??x['rating']);
+                    return Material(color:_catalogCard,borderRadius:BorderRadius.circular(15),clipBehavior:Clip.antiAlias,
+                      child:InkWell(onTap:()=>widget.onOpenAnime(id),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
+                        Expanded(child:Stack(fit:StackFit.expand,children:[
+                          if(poster.isNotEmpty)Image.network(poster,fit:BoxFit.cover,errorBuilder:(_,__,___)=>const _PosterFallback()) else const _PosterFallback(),
+                          const DecoratedBox(decoration:BoxDecoration(gradient:LinearGradient(begin:Alignment.topCenter,end:Alignment.bottomCenter,colors:[Colors.transparent,Color(0x9906000D)]))),
+                          if(score.isNotEmpty)Positioned(top:8,right:8,child:Container(padding:const EdgeInsets.symmetric(horizontal:8,vertical:5),decoration:BoxDecoration(color:const Color(0xCC4A2925),borderRadius:BorderRadius.circular(20)),child:Text('★ $score',style:const TextStyle(fontSize:11,fontWeight:FontWeight.w800,color:Colors.white)))),
                         ])),
-                    ])),
-                );
-              },childCount:_items.length),
-            )),
+                        Padding(padding:const EdgeInsets.fromLTRB(10,9,10,10),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
+                          Text(title,maxLines:2,overflow:TextOverflow.ellipsis,style:const TextStyle(fontSize:13,fontWeight:FontWeight.w800,height:1.2)),
+                          if(year.isNotEmpty)Padding(padding:const EdgeInsets.only(top:4),child:Text(year,style:const TextStyle(fontSize:11,color:Color(0xFF927A75)))),
+                        ])),
+                      ])));
+                  },childCount:_visibleItems.length),
+                )
+              : SliverList(delegate:SliverChildBuilderDelegate((context,index){
+                  final x=_visibleItems[index];
+                  final id=(x['id']??x['anime_id']??x['animeId']).toString();
+                  final poster=_poster(x), title=_title(x);
+                  return Card(color:_catalogCard,margin:const EdgeInsets.only(bottom:9),child:ListTile(
+                    onTap:()=>widget.onOpenAnime(id),
+                    leading:ClipRRect(borderRadius:BorderRadius.circular(8),child:SizedBox(width:52,height:66,child:poster.isEmpty?const _PosterFallback():Image.network(poster,fit:BoxFit.cover,errorBuilder:(_,__,___)=>const _PosterFallback()))),
+                    title:Text(title,maxLines:2,overflow:TextOverflow.ellipsis,style:const TextStyle(fontWeight:FontWeight.w800)),
+                    subtitle:Text(_string(x['year']??_map(x['aired'])['year'])),
+                    trailing:const Icon(Icons.chevron_right_rounded,color:_catalogPink),
+                  ));
+                },childCount:_visibleItems.length))),
+,
         ],
       ),
     );
