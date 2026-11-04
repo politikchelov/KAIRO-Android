@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'anime_catalog.dart';
 import 'anime_detail.dart';
+import 'favorites_screen.dart';
 
 const _bg = Color(0xFF090611);
 const _surface = Color(0xFF171021);
@@ -66,8 +67,7 @@ class _KairoShellState extends State<KairoShell> {
       AnimeCatalogScreen(onOpenAnime: _openAnime),
       const _ComingSoonScreen(title: 'Чат', icon: Icons.forum_rounded,
         subtitle: 'Общение KAIRO появится здесь. Это отдельный экран приложения.'),
-      const _ComingSoonScreen(title: 'Избранное', icon: Icons.favorite_rounded,
-        subtitle: 'Здесь будут сохранённые тайтлы твоего аккаунта KAIRO.'),
+      FavoritesScreen(onOpenAnime: _openAnime),
       const _ComingSoonScreen(title: 'Профиль', icon: Icons.person_rounded,
         subtitle: 'Здесь будут авторизация, профиль, KC и коллекция карточек.'),
     ];
