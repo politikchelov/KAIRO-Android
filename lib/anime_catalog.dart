@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -23,6 +24,22 @@ class _AnimeCatalogScreenState extends State<AnimeCatalogScreen> {
   bool _searchMode = false;
   String? _error;
   int _request = 0;
+  bool _grid = true;
+  String _sort = 'По умолчанию';
+  String _genre = 'Все';
+
+  List<Map<String,dynamic>> get _visibleItems {
+    var list = _items.where((x) => _genre == 'Все' || _genres(x).contains(_genre)).toList();
+    if (_sort == 'По названию') list.sort((a,b)=>_title(a).compareTo(_title(b)));
+    if (_sort == 'По рейтингу') list.sort((a,b)=>(double.tryParse(_string(b['score']??b['rating']))??0).compareTo(double.tryParse(_string(a['score']??a['rating']))??0));
+    return list;
+  }
+  List<String> _genres(Map<String,dynamic> x) {
+    final raw=x['genres']??x['genre']??x['tags'];
+    if(raw is List) return raw.map(_string).where((s)=>s.isNotEmpty).toList();
+    if(raw is String) return raw.split(RegExp(r'[,/]')).map((s)=>s.trim()).where((s)=>s.isNotEmpty).toList();
+    return [];
+  }
 
   @override
   void initState() {
@@ -178,7 +195,7 @@ class _AnimeCatalogScreenState extends State<AnimeCatalogScreen> {
                 FilledButton(onPressed:()=>_load(query:_search.text.trim().length>=2?_search.text.trim():null),child:const Text('Повторить')),
               ]),
             )))
-          else if (_items.isEmpty)
+          else if (_visibleItems.isEmpty)
             const SliverFillRemaining(hasScrollBody:false,child:Center(child:Column(mainAxisSize:MainAxisSize.min,children:[
               Icon(Icons.search_off_rounded,color:_catalogPink,size:44),
               SizedBox(height:12),Text('Ничего не найдено',style:TextStyle(fontSize:18,fontWeight:FontWeight.w800)),
