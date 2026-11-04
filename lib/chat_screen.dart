@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'kairo_backend.dart';
 
-const _chatPink = Color(0xFFE34BFF);
-const _chatPanel = Color(0xFF171021);
+const _chatPink = Color(0xFFEF7166);
+const _chatPanel = Color(0xFFFFFFFF);
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -75,7 +75,7 @@ class _ChatScreenState extends State<ChatScreen> {
           if (snapshot.hasError) return Center(child: Padding(
             padding: const EdgeInsets.all(24),
             child: Text('Не удалось загрузить чат: ${snapshot.error}', textAlign: TextAlign.center,
-              style: const TextStyle(color: Color(0xFFB6A8C5))),
+              style: const TextStyle(color: Color(0xFF927A75))),
           ));
           if (!snapshot.hasData) return const Center(child: CircularProgressIndicator(color: _chatPink));
           final rows = snapshot.data!;
@@ -99,7 +99,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   margin: const EdgeInsets.only(bottom: 9),
                   padding: const EdgeInsets.fromLTRB(13, 10, 13, 9),
                   decoration: BoxDecoration(
-                    color: mine ? const Color(0xFF38204B) : _chatPanel,
+                    color: mine ? const Color(0xFFFFDED8) : _chatPanel,
                     borderRadius: BorderRadius.circular(15),
                     border: Border.all(color: mine ? const Color(0x668B20F5) : const Color(0x221FFFFFFF)),
                   ),
@@ -129,7 +129,7 @@ class _ChatScreenState extends State<ChatScreen> {
       top: false,
       child: Container(
         padding: const EdgeInsets.fromLTRB(12, 9, 12, 9),
-        decoration: const BoxDecoration(color: Color(0xFF100B19), border: Border(top: BorderSide(color: Color(0x332F2040)))),
+        decoration: const BoxDecoration(color: Color(0xFFFFE7E2), border: Border(top: BorderSide(color: Color(0x332F2040)))),
         child: Row(children: [
           Expanded(child: TextField(
             controller: _controller, minLines: 1, maxLines: 4,
@@ -144,7 +144,7 @@ class _ChatScreenState extends State<ChatScreen> {
           const SizedBox(width: 8),
           IconButton.filled(
             onPressed: _sending ? null : _send,
-            style: IconButton.styleFrom(backgroundColor: const Color(0xFF8126C7)),
+            style: IconButton.styleFrom(backgroundColor: const Color(0xFFEF7166)),
             icon: _sending
               ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
               : const Icon(Icons.send_rounded),
