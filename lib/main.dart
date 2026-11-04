@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 const _bg = Color(0xFF090611);
+const _surface = Color(0xFF171021);
 const _purple = Color(0xFF8B20F5);
 const _pink = Color(0xFFE34BFF);
 
@@ -31,13 +32,20 @@ class KairoApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(
           seedColor: _purple,
           brightness: Brightness.dark,
-          surface: _bg,
+          surface: _surface,
         ),
         useMaterial3: true,
       ),
       home: const KairoAppView(),
     );
   }
+}
+
+class _Tab {
+  const _Tab(this.label, this.icon, this.route);
+  final String label;
+  final IconData icon;
+  final String route;
 }
 
 class KairoAppView extends StatefulWidget {
@@ -48,8 +56,17 @@ class KairoAppView extends StatefulWidget {
 }
 
 class _KairoAppViewState extends State<KairoAppView> {
-  static final Uri _home = Uri.parse('https://kaironet.vercel.app/');
+  static const _base = 'https://kaironet.vercel.app/';
+  static const _tabs = <_Tab>[
+    _Tab('Главная', Icons.home_rounded, ''),
+    _Tab('Каталог', Icons.grid_view_rounded, '#/vibe'),
+    _Tab('Чат', Icons.forum_rounded, '#/chat'),
+    _Tab('Избранное', Icons.favorite_rounded, '#/fav'),
+    _Tab('Профиль', Icons.person_rounded, '#/me'),
+  ];
+
   late final WebViewController _web;
+  int _selected = 0;
   int _progress = 0;
   bool _failed = false;
   bool _firstPaint = false;
@@ -78,7 +95,20 @@ class _KairoAppViewState extends State<KairoAppView> {
             _progress = 0;
           });
         },
-        onPageFinished: (_) {
+        onPageFinished: (_) async {
+          // The app owns the bottom navigation. Hide the website's duplicate
+          // mobile dock while keeping the site's own routing and session.
+          await _web.runJavaScript("""
+            (function() {
+              var style = document.getElementById('kairo-native-shell');
+              if (!style) {
+                style = document.createElement('style');
+                style.id = 'kairo-native-shell';
+                style.textContent = '.mobile-dock{display:none!important} body{padding-bottom:0!important}';
+                document.head.appendChild(style);
+              }
+            })();
+          """);
           if (!mounted) return;
           setState(() {
             _firstPaint = true;
@@ -97,15 +127,13 @@ class _KairoAppViewState extends State<KairoAppView> {
         onNavigationRequest: (request) {
           final uri = Uri.tryParse(request.url);
           if (uri == null) return NavigationDecision.prevent;
-          // Keep the KAIRO site and its authentication/player redirects in the
-          // same WebView so the existing site session and playback keep working.
           if (uri.scheme == 'https' || uri.scheme == 'http') {
             return NavigationDecision.navigate;
           }
           return NavigationDecision.prevent;
         },
       ))
-      ..loadRequest(_home);
+      ..loadRequest(Uri.parse(_base));
   }
 
   Future<bool> _onBack() async {
@@ -113,7 +141,28 @@ class _KairoAppViewState extends State<KairoAppView> {
       await _web.goBack();
       return false;
     }
+    if (_selected != 0) {
+      _openTab(0);
+      return false;
+    }
     return true;
+  }
+
+  Future<void> _openTab(int index) async {
+    if (index < 0 || index >= _tabs.length) return;
+    setState(() => _selected = index);
+    await _web.loadRequest(Uri.parse('$_base${_tabs[index].route}'));
+  }
+
+  Future<void> _openSearch() async {
+    await _openTab(1);
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+    await _web.runJavaScript("""
+      (function() {
+        var input = document.querySelector('#q');
+        if (input) { input.focus(); input.scrollIntoView({block:'center'}); }
+      })();
+    """);
   }
 
   Future<void> _retry() async {
@@ -122,7 +171,7 @@ class _KairoAppViewState extends State<KairoAppView> {
       _busy = true;
       _progress = 0;
     });
-    await _web.loadRequest(_home);
+    await _web.loadRequest(Uri.parse('$_base'));
   }
 
   @override
@@ -132,33 +181,68 @@ class _KairoAppViewState extends State<KairoAppView> {
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
         final shouldExit = await _onBack();
-        if (shouldExit && mounted) {
-          await SystemNavigator.pop();
-        }
+        if (shouldExit && mounted) await SystemNavigator.pop();
       },
       child: Scaffold(
         backgroundColor: _bg,
-        body: Stack(
-          fit: StackFit.expand,
-          children: [
-            WebViewWidget(controller: _web),
-            if (_busy && !_firstPaint)
-              const _LaunchScreen(),
-            if (_busy && _firstPaint)
-              Align(
-                alignment: Alignment.topCenter,
-                child: IgnorePointer(
+        appBar: AppBar(
+          backgroundColor: _bg,
+          surfaceTintColor: Colors.transparent,
+          elevation: 0,
+          titleSpacing: 18,
+          title: ShaderMask(
+            shaderCallback: (bounds) => const LinearGradient(
+              colors: [_pink, _purple, Color(0xFFB7A0FF)],
+            ).createShader(bounds),
+            child: const Text(
+              'KAIRO✦',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 1.5,
+                fontSize: 23,
+              ),
+            ),
+          ),
+          actions: [
+            IconButton(
+              tooltip: 'Поиск аниме',
+              onPressed: _openSearch,
+              icon: const Icon(Icons.search_rounded),
+            ),
+            const SizedBox(width: 5),
+          ],
+          bottom: _busy && _firstPaint
+              ? PreferredSize(
+                  preferredSize: const Size.fromHeight(2),
                   child: LinearProgressIndicator(
                     value: _progress == 0 ? null : _progress / 100,
                     minHeight: 2,
                     backgroundColor: Colors.transparent,
                     color: _pink,
                   ),
-                ),
-              ),
-            if (_failed)
-              _NetworkError(onRetry: _retry),
+                )
+              : null,
+        ),
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            WebViewWidget(controller: _web),
+            if (_busy && !_firstPaint) const _LaunchScreen(),
+            if (_failed) _NetworkError(onRetry: _retry),
           ],
+        ),
+        bottomNavigationBar: NavigationBar(
+          height: 68,
+          backgroundColor: const Color(0xFF100B19),
+          indicatorColor: _purple.withValues(alpha: .22),
+          selectedIndex: _selected,
+          onDestinationSelected: _openTab,
+          destinations: _tabs.map((tab) => NavigationDestination(
+            icon: Icon(tab.icon, size: 21),
+            selectedIcon: Icon(tab.icon, size: 22, color: _pink),
+            label: tab.label,
+          )).toList(),
         ),
       ),
     );
