@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'favorites_store.dart';
 
-const _detailBg = Color(0xFF090611);
-const _detailPanel = Color(0xFF171021);
-const _detailPink = Color(0xFFE34BFF);
+const _detailBg = Color(0xFFFFF3F0);
+const _detailPanel = Color(0xFFFFFFFF);
+const _detailPink = Color(0xFFEF7166);
 
 class AnimeDetailScreen extends StatefulWidget {
   const AnimeDetailScreen({super.key, required this.animeId});
@@ -223,11 +223,11 @@ class _AnimeDetailScreenState extends State<AnimeDetailScreen> {
                       const SizedBox(height: 24),
                       Row(children: [
                         const Expanded(child: Text('ЭПИЗОДЫ', style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900))),
-                        Text('${_episodes.length} доступно', style: const TextStyle(color: Color(0xFFB6A8C5), fontSize: 12)),
+                        Text('${_episodes.length} доступно', style: const TextStyle(color: Color(0xFF927A75), fontSize: 12)),
                       ]),
                       const SizedBox(height: 12),
                       if (_episodes.isEmpty)
-                        const Text('Список серий пока недоступен.', style: TextStyle(color: Color(0xFFB6A8C5)))
+                        const Text('Список серий пока недоступен.', style: TextStyle(color: Color(0xFF927A75)))
                       else
                         Wrap(
                           spacing: 9,
@@ -296,7 +296,7 @@ class _ErrorView extends StatelessWidget {
         const SizedBox(height: 14),
         const Text('Не удалось загрузить аниме', style: TextStyle(fontSize: 19, fontWeight: FontWeight.w900)),
         const SizedBox(height: 8),
-        Text(message, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFFB6A8C5))),
+        Text(message, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF927A75))),
         const SizedBox(height: 16),
         FilledButton.icon(onPressed: onRetry, icon: const Icon(Icons.refresh_rounded), label: const Text('Повторить')),
       ]),
