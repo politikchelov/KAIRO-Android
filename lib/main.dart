@@ -1,7 +1,6 @@
-import 'anime_catalog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'anime_catalog.dart';
 
 const _bg = Color(0xFF090611);
 const _surface = Color(0xFF171021);
@@ -23,166 +22,59 @@ class KairoApp extends StatelessWidget {
   const KairoApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'KAIRO',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        scaffoldBackgroundColor: _bg,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: _purple,
-          brightness: Brightness.dark,
-          surface: _surface,
-        ),
-        useMaterial3: true,
-      ),
-      home: const KairoAppView(),
-    );
-  }
+  Widget build(BuildContext context) => MaterialApp(
+    title: 'KAIRO',
+    debugShowCheckedModeBanner: false,
+    theme: ThemeData(
+      brightness: Brightness.dark,
+      scaffoldBackgroundColor: _bg,
+      colorScheme: ColorScheme.fromSeed(seedColor: _purple, brightness: Brightness.dark, surface: _surface),
+      useMaterial3: true,
+    ),
+    home: const KairoShell(),
+  );
 }
 
-class _Tab {
-  const _Tab(this.label, this.icon, this.route);
-  final String label;
-  final IconData icon;
-  final String route;
-}
-
-class KairoAppView extends StatefulWidget {
-  const KairoAppView({super.key});
+class KairoShell extends StatefulWidget {
+  const KairoShell({super.key});
 
   @override
-  State<KairoAppView> createState() => _KairoAppViewState();
+  State<KairoShell> createState() => _KairoShellState();
 }
 
-class _KairoAppViewState extends State<KairoAppView> {
-  static const _base = 'https://kaironet.vercel.app/';
-  static const _tabs = <_Tab>[
-    _Tab('Главная', Icons.home_rounded, ''),
-    _Tab('Каталог', Icons.grid_view_rounded, '#/vibe'),
-    _Tab('Чат', Icons.forum_rounded, '#/chat'),
-    _Tab('Избранное', Icons.favorite_rounded, '#/fav'),
-    _Tab('Профиль', Icons.person_rounded, '#/me'),
+class _KairoShellState extends State<KairoShell> {
+  int _index = 0;
+
+  static const _destinations = [
+    NavigationDestination(icon: Icon(Icons.home_rounded), label: 'Главная'),
+    NavigationDestination(icon: Icon(Icons.grid_view_rounded), label: 'Каталог'),
+    NavigationDestination(icon: Icon(Icons.forum_rounded), label: 'Чат'),
+    NavigationDestination(icon: Icon(Icons.favorite_rounded), label: 'Избранное'),
+    NavigationDestination(icon: Icon(Icons.person_rounded), label: 'Профиль'),
   ];
 
-  late final WebViewController _web;
-  int _selected = 0;
-  int _progress = 0;
-  bool _failed = false;
-  bool _firstPaint = false;
-  bool _busy = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _web = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(_bg)
-      ..enableZoom(false)
-      ..setNavigationDelegate(NavigationDelegate(
-        onProgress: (value) {
-          if (!mounted) return;
-          setState(() {
-            _progress = value;
-            _busy = value < 100;
-          });
-        },
-        onPageStarted: (_) {
-          if (!mounted) return;
-          setState(() {
-            _failed = false;
-            _busy = true;
-            _progress = 0;
-          });
-        },
-        onPageFinished: (_) async {
-          // The app owns the bottom navigation. Hide the website's duplicate
-          // mobile dock while keeping the site's own routing and session.
-          await _web.runJavaScript("""
-            (function() {
-              var style = document.getElementById('kairo-native-shell');
-              if (!style) {
-                style = document.createElement('style');
-                style.id = 'kairo-native-shell';
-                style.textContent = '.mobile-dock{display:none!important} body{padding-bottom:0!important}';
-                document.head.appendChild(style);
-              }
-            })();
-          """);
-          if (!mounted) return;
-          setState(() {
-            _firstPaint = true;
-            _busy = false;
-            _progress = 100;
-          });
-        },
-        onWebResourceError: (error) {
-          if (error.isForMainFrame == true && mounted) {
-            setState(() {
-              _failed = true;
-              _busy = false;
-            });
-          }
-        },
-        onNavigationRequest: (request) {
-          final uri = Uri.tryParse(request.url);
-          if (uri == null) return NavigationDecision.prevent;
-          if (uri.scheme == 'https' || uri.scheme == 'http') {
-            return NavigationDecision.navigate;
-          }
-          return NavigationDecision.prevent;
-        },
-      ))
-      ..loadRequest(Uri.parse(_base));
-  }
-
-  Future<bool> _onBack() async {
-    if (await _web.canGoBack()) {
-      await _web.goBack();
-      return false;
-    }
-    if (_selected != 0) {
-      _openTab(0);
-      return false;
-    }
-    return true;
-  }
-
-  Future<void> _openTab(int index) async {
-    if (index < 0 || index >= _tabs.length) return;
-    setState(() => _selected = index);
-    await _web.loadRequest(Uri.parse('$_base${_tabs[index].route}'));
-  }
-
   Future<void> _openSearch() async {
-    await _openTab(1);
-    await Future<void>.delayed(const Duration(milliseconds: 500));
-    await _web.runJavaScript("""
-      (function() {
-        var input = document.querySelector('#q');
-        if (input) { input.focus(); input.scrollIntoView({block:'center'}); }
-      })();
-    """);
-  }
-
-  Future<void> _retry() async {
-    setState(() {
-      _failed = false;
-      _busy = true;
-      _progress = 0;
-    });
-    await _web.loadRequest(Uri.parse('$_base'));
+    setState(() => _index = 1);
+    // The catalog owns its search field; no website scripting or WebView.
   }
 
   @override
   Widget build(BuildContext context) {
+    final pages = <Widget>[
+      const _HomeScreen(),
+      AnimeCatalogScreen(onOpenAnime: _openAnime),
+      const _ComingSoonScreen(title: 'Чат', icon: Icons.forum_rounded,
+        subtitle: 'Общение KAIRO появится здесь. Это отдельный экран приложения.'),
+      const _ComingSoonScreen(title: 'Избранное', icon: Icons.favorite_rounded,
+        subtitle: 'Здесь будут сохранённые тайтлы твоего аккаунта KAIRO.'),
+      const _ComingSoonScreen(title: 'Профиль', icon: Icons.person_rounded,
+        subtitle: 'Здесь будут авторизация, профиль, KC и коллекция карточек.'),
+    ];
+
     return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) return;
-        final shouldExit = await _onBack();
-        if (shouldExit && mounted) await SystemNavigator.pop();
+      canPop: _index == 0,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop && _index != 0) setState(() => _index = 0);
       },
       child: Scaffold(
         backgroundColor: _bg,
@@ -195,15 +87,10 @@ class _KairoAppViewState extends State<KairoAppView> {
             shaderCallback: (bounds) => const LinearGradient(
               colors: [_pink, _purple, Color(0xFFB7A0FF)],
             ).createShader(bounds),
-            child: const Text(
-              'KAIRO✦',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w900,
-                letterSpacing: 1.5,
-                fontSize: 23,
-              ),
-            ),
+            child: const Text('KAIRO✦', style: TextStyle(
+              color: Colors.white, fontWeight: FontWeight.w900,
+              letterSpacing: 1.5, fontSize: 23,
+            )),
           ),
           actions: [
             IconButton(
@@ -213,140 +100,179 @@ class _KairoAppViewState extends State<KairoAppView> {
             ),
             const SizedBox(width: 5),
           ],
-          bottom: _busy && _firstPaint
-              ? PreferredSize(
-                  preferredSize: const Size.fromHeight(2),
-                  child: LinearProgressIndicator(
-                    value: _progress == 0 ? null : _progress / 100,
-                    minHeight: 2,
-                    backgroundColor: Colors.transparent,
-                    color: _pink,
-                  ),
-                )
-              : null,
         ),
-        body: Stack(
-          fit: StackFit.expand,
-          children: [
-            WebViewWidget(controller: _web),
-            if (_busy && !_firstPaint) const _LaunchScreen(),
-            if (_failed) _NetworkError(onRetry: _retry),
-          ],
-        ),
+        body: IndexedStack(index: _index, children: pages),
         bottomNavigationBar: NavigationBar(
           height: 68,
           backgroundColor: const Color(0xFF100B19),
           indicatorColor: _purple.withValues(alpha: .22),
-          selectedIndex: _selected,
-          onDestinationSelected: _openTab,
-          destinations: _tabs.map((tab) => NavigationDestination(
-            icon: Icon(tab.icon, size: 21),
-            selectedIcon: Icon(tab.icon, size: 22, color: _pink),
-            label: tab.label,
-          )).toList(),
+          selectedIndex: _index,
+          onDestinationSelected: (value) => setState(() => _index = value),
+          destinations: _destinations,
         ),
       ),
     );
   }
-}
 
-class _LaunchScreen extends StatelessWidget {
-  const _LaunchScreen();
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: const BoxDecoration(
-        gradient: RadialGradient(
-          center: Alignment(0, -0.55),
-          radius: 1.15,
-          colors: [Color(0xFF281044), _bg, Color(0xFF05030A)],
-        ),
-      ),
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ShaderMask(
-              shaderCallback: (bounds) => const LinearGradient(
-                colors: [_pink, _purple, Color(0xFFB7A0FF)],
-              ).createShader(bounds),
-              child: const Text(
-                'KAIRO✦',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 38,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 2.5,
-                ),
-              ),
-            ),
-            const SizedBox(height: 22),
-            const SizedBox(
-              width: 112,
-              child: LinearProgressIndicator(
-                minHeight: 3,
-                backgroundColor: Color(0x443D2458),
-                color: _pink,
-              ),
-            ),
-            const SizedBox(height: 14),
-            const Text(
-              'Загружаем твой мир аниме…',
-              style: TextStyle(color: Color(0xFFB8A9CA), fontSize: 12),
-            ),
-          ],
-        ),
-      ),
-    );
+  void _openAnime(String id) {
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (_) => _AnimeDetailScreen(animeId: id),
+    ));
   }
 }
 
-class _NetworkError extends StatelessWidget {
-  const _NetworkError({required this.onRetry});
-  final VoidCallback onRetry;
+class _HomeScreen extends StatelessWidget {
+  const _HomeScreen();
 
   @override
-  Widget build(BuildContext context) {
-    return ColoredBox(
-      color: _bg,
-      child: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(30),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.cloud_off_rounded, size: 48, color: _pink),
-              const SizedBox(height: 18),
-              const Text(
-                'KAIRO пока не отвечает',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 21, fontWeight: FontWeight.w800),
-              ),
-              const SizedBox(height: 9),
-              const Text(
-                'Проверь интернет и попробуй загрузить приложение ещё раз.',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Color(0xFFAAA0B8), height: 1.5),
-              ),
-              const SizedBox(height: 22),
-              FilledButton.icon(
-                style: FilledButton.styleFrom(
-                  backgroundColor: _purple,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 13,
-                  ),
-                ),
-                onPressed: onRetry,
-                icon: const Icon(Icons.refresh_rounded),
-                label: const Text('Повторить'),
-              ),
-            ],
+  Widget build(BuildContext context) => ListView(
+    padding: const EdgeInsets.fromLTRB(18, 18, 18, 32),
+    children: [
+      const Text('ТВОЯ АНИМЕ-ВСЕЛЕННАЯ',
+        style: TextStyle(color: _pink, fontSize: 10, letterSpacing: 2, fontWeight: FontWeight.w800)),
+      const SizedBox(height: 8),
+      const Text('Добро пожаловать в KAIRO',
+        style: TextStyle(fontSize: 27, height: 1.12, fontWeight: FontWeight.w900)),
+      const SizedBox(height: 18),
+      Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(22),
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft, end: Alignment.bottomRight,
+            colors: [Color(0xFF47206B), Color(0xFF1D1230), Color(0xFF110B1B)],
           ),
+          border: Border.all(color: const Color(0x557C42B8)),
         ),
+        child: const Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('KAIRO ORIGINAL', style: TextStyle(color: Color(0xFFFFB6FF), fontSize: 10, letterSpacing: 2, fontWeight: FontWeight.w800)),
+          SizedBox(height: 12),
+          Text('Истории, в которые хочется возвращаться.',
+            style: TextStyle(fontSize: 23, height: 1.15, fontWeight: FontWeight.w900)),
+          SizedBox(height: 10),
+          Text('Исследуй каталог и открывай новые миры.',
+            style: TextStyle(color: Color(0xFFD4C5E3), height: 1.4)),
+        ]),
       ),
-    );
-  }
+      const SizedBox(height: 24),
+      const Text('ТВОЙ СЛЕДУЮЩИЙ ШАГ',
+        style: TextStyle(color: Color(0xFFB9A9CA), fontSize: 11, letterSpacing: 1.4, fontWeight: FontWeight.w800)),
+      const SizedBox(height: 10),
+      _HomeAction(
+        icon: Icons.grid_view_rounded,
+        title: 'Открыть каталог',
+        subtitle: 'Поиск и подбор аниме',
+        onTap: () => (context.findAncestorStateOfType<_KairoShellState>()?._index = 1),
+      ),
+      const SizedBox(height: 10),
+      const _InfoTile(
+        icon: Icons.construction_rounded,
+        title: 'Приложение развивается',
+        subtitle: 'Новые нативные разделы будут добавляться поэтапно.',
+      ),
+    ],
+  );
+}
+
+class _HomeAction extends StatelessWidget {
+  const _HomeAction({required this.icon, required this.title, required this.subtitle, required this.onTap});
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Material(
+    color: _surface,
+    borderRadius: BorderRadius.circular(16),
+    child: InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Padding(
+        padding: const EdgeInsets.all(15),
+        child: Row(children: [
+          Icon(icon, color: _pink, size: 25),
+          const SizedBox(width: 13),
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
+            const SizedBox(height: 3),
+            Text(subtitle, style: const TextStyle(color: Color(0xFFB6A8C5), fontSize: 12)),
+          ])),
+          const Icon(Icons.chevron_right_rounded, color: Color(0xFFB6A8C5)),
+        ]),
+      ),
+    ),
+  );
+}
+
+class _InfoTile extends StatelessWidget {
+  const _InfoTile({required this.icon, required this.title, required this.subtitle});
+  final IconData icon;
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.all(15),
+    decoration: BoxDecoration(color: const Color(0xFF120D1B), borderRadius: BorderRadius.circular(16)),
+    child: Row(children: [
+      Icon(icon, color: _pink),
+      const SizedBox(width: 12),
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
+        const SizedBox(height: 4),
+        Text(subtitle, style: const TextStyle(color: Color(0xFFB6A8C5), fontSize: 12)),
+      ])),
+    ]),
+  );
+}
+
+class _ComingSoonScreen extends StatelessWidget {
+  const _ComingSoonScreen({required this.title, required this.icon, required this.subtitle});
+  final String title;
+  final IconData icon;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) => Center(
+    child: Padding(
+      padding: const EdgeInsets.all(30),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        Icon(icon, size: 54, color: _pink),
+        const SizedBox(height: 16),
+        Text(title, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900)),
+        const SizedBox(height: 8),
+        Text(subtitle, textAlign: TextAlign.center,
+          style: const TextStyle(color: Color(0xFFB6A8C5), height: 1.5)),
+        const SizedBox(height: 18),
+        const Text('Раздел ещё разрабатывается',
+          style: TextStyle(color: Color(0xFFFFB6FF), fontSize: 12, fontWeight: FontWeight.w700)),
+      ]),
+    ),
+  );
+}
+
+class _AnimeDetailScreen extends StatelessWidget {
+  const _AnimeDetailScreen({required this.animeId});
+  final String animeId;
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    backgroundColor: _bg,
+    appBar: AppBar(backgroundColor: _bg, title: const Text('Аниме')),
+    body: Center(child: Padding(
+      padding: const EdgeInsets.all(28),
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        const Icon(Icons.movie_creation_outlined, color: _pink, size: 48),
+        const SizedBox(height: 14),
+        const Text('Страница аниме готовится',
+          style: TextStyle(fontSize: 19, fontWeight: FontWeight.w800)),
+        const SizedBox(height: 8),
+        const Text('Следующим этапом подключим описание, список серий и отдельный видеоплеер.',
+          textAlign: TextAlign.center, style: TextStyle(color: Color(0xFFB6A8C5), height: 1.4)),
+        const SizedBox(height: 10),
+        Text('ID: $animeId', style: const TextStyle(color: Color(0xFF887A99), fontSize: 11)),
+      ]),
+    )),
+  );
 }
