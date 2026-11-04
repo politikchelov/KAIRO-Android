@@ -143,7 +143,15 @@ class _KairoShellState extends State<KairoShell> {
     );
   }
 
-  void _openHistory() {\n    Navigator.of(context).push(MaterialPageRoute(builder: (_) => HistoryScreen(onOpenAnime: _openAnime)));\n  }\n\n  void _openAnime(String id) {
+  void _openHistory() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => HistoryScreen(onOpenAnime: _openAnime),
+      ),
+    );
+  }
+
+  void _openAnime(String id) {
     Navigator.of(context).push(MaterialPageRoute(
       builder: (_) => AnimeDetailScreen(animeId: id),
     ));
@@ -151,8 +159,12 @@ class _KairoShellState extends State<KairoShell> {
 }
 
 class _HomeScreen extends StatelessWidget {
-  const _HomeScreen({required this.onOpenCatalog});
+  const _HomeScreen({
+    required this.onOpenCatalog,
+    required this.onOpenHistory,
+  });
   final VoidCallback onOpenCatalog;
+  final VoidCallback onOpenHistory;
 
   @override
   Widget build(BuildContext context) => ListView(
@@ -213,7 +225,9 @@ class _HomeScreen extends StatelessWidget {
         Expanded(child: _HomeFeature(icon: Icons.auto_awesome_rounded, title: 'Новинки', subtitle: 'Свежие тайтлы', onTap: onOpenCatalog)),
       ]),
       const SizedBox(height: 12),
-      _HomeAction(icon: Icons.grid_view_rounded, title: 'Открыть каталог', subtitle: 'Поиск, жанры и подбор аниме', onTap: onOpenCatalog),\n      const SizedBox(height: 10),\n      _HomeAction(icon: Icons.history_rounded, title: 'История просмотров', subtitle: 'Продолжи знакомство с недавно открытыми тайтлами', onTap: onOpenHistory),
+      _HomeAction(icon: Icons.grid_view_rounded, title: 'Открыть каталог', subtitle: 'Поиск, жанры и подбор аниме', onTap: onOpenCatalog),
+      const SizedBox(height: 10),
+      _HomeAction(icon: Icons.history_rounded, title: 'История просмотров', subtitle: 'Продолжи знакомство с недавно открытыми тайтлами', onTap: onOpenHistory),
     ],
   );
 }
