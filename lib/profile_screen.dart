@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'kairo_backend.dart';
 
 const _profilePink = Color(0xFFEF7166);
@@ -99,7 +100,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _info(String label, String value) => Container(
+  Future<void> _editProfile() async {\n    final bioController=TextEditingController(text:(_profile?['bio']??'').toString());\n    final statusController=TextEditingController(text:(_profile?['status']??'').toString());\n    final result=await showDialog<bool>(context:context,builder:(ctx)=>AlertDialog(\n      title:const Text('Мой профиль'),content:Column(mainAxisSize:MainAxisSize.min,children:[\n        TextField(controller:statusController,maxLength:60,decoration:const InputDecoration(labelText:'Статус')),\n        const SizedBox(height:8),TextField(controller:bioController,maxLength:240,maxLines:4,decoration:const InputDecoration(labelText:'О себе')),\n      ]),actions:[TextButton(onPressed:()=>Navigator.pop(ctx,false),child:const Text('Отмена')),FilledButton(onPressed:()=>Navigator.pop(ctx,true),child:const Text('Сохранить'))]));\n    if(result!=true)return;\n    try {\n      final id=kairoSupabase.auth.currentUser?.id;\n      if(id==null)return;\n      await kairoSupabase.from('profiles').update({'status':statusController.text.trim(),'bio':bioController.text.trim()}).eq('id',id);\n      await _load();\n      if(mounted)ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:Text('Профиль обновлён')));\n    } catch(e) { if(mounted)ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text('Не удалось сохранить: $e'))); }\n  }\n\n  Widget _info(String label, String value) => Container(
     margin: const EdgeInsets.only(bottom: 9),
     padding: const EdgeInsets.all(14),
     decoration: BoxDecoration(color: const Color(0xFFFFFFFF), borderRadius: BorderRadius.circular(13)),
