@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'kairo_backend.dart';
 
-const _authPink = Color(0xFFE34BFF);
-const _authPanel = Color(0xFF171021);
+const _authPink = Color(0xFFEF7166);
+const _authPanel = Color(0xFFFFFFFF);
 const _redirectUrl = 'com.kairo.app.kairo_android://login-callback/';
 
 class AuthScreen extends StatefulWidget {
@@ -92,14 +92,14 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   InputDecoration _decoration(String hint) => InputDecoration(
-    hintText: hint, filled: true, fillColor: const Color(0xFF0D0914),
+    hintText: hint, filled: true, fillColor: const Color(0xFFFFF8F6),
     border: OutlineInputBorder(borderRadius: BorderRadius.circular(13), borderSide: BorderSide.none),
     contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
   );
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    backgroundColor: const Color(0xFF090611),
+    backgroundColor: const Color(0xFFFFF3F0),
     body: SafeArea(
       child: Center(
         child: SingleChildScrollView(
@@ -116,7 +116,7 @@ class _AuthScreenState extends State<AuthScreen> {
                   style: TextStyle(fontSize: 32, fontWeight: FontWeight.w900, letterSpacing: 3)),
                 const SizedBox(height: 8),
                 Text(_register ? 'Создай свой аккаунт KAIRO' : 'Войди в свой аккаунт',
-                  textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFFB6A8C5))),
+                  textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF927A75))),
                 const SizedBox(height: 28),
                 Container(
                   padding: const EdgeInsets.all(20),
@@ -157,7 +157,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     const SizedBox(height: 20),
                     FilledButton(
                       onPressed: _busy ? null : _submit,
-                      style: FilledButton.styleFrom(backgroundColor: const Color(0xFF8126C7),
+                      style: FilledButton.styleFrom(backgroundColor: const Color(0xFFEF7166),
                         padding: const EdgeInsets.symmetric(vertical: 15)),
                       child: _busy
                         ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
@@ -166,10 +166,10 @@ class _AuthScreenState extends State<AuthScreen> {
                     ),
                     const SizedBox(height: 14),
                     const Row(children: [
-                      Expanded(child: Divider(color: Color(0xFF493653))),
+                      Expanded(child: Divider(color: Color(0xFFF0D8D3))),
                       Padding(padding: EdgeInsets.symmetric(horizontal: 12),
-                        child: Text('ИЛИ', style: TextStyle(color: Color(0xFF94869F), fontSize: 10))),
-                      Expanded(child: Divider(color: Color(0xFF493653))),
+                        child: Text('ИЛИ', style: TextStyle(color: Color(0xFF927A75), fontSize: 10))),
+                      Expanded(child: Divider(color: Color(0xFFF0D8D3))),
                     ]),
                     const SizedBox(height: 14),
                     OutlinedButton.icon(
@@ -177,8 +177,8 @@ class _AuthScreenState extends State<AuthScreen> {
                       icon: const Icon(Icons.g_mobiledata_rounded, size: 28),
                       label: const Text('Продолжить с Google'),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        side: const BorderSide(color: Color(0xFF5A4969)),
+                        foregroundColor: Color(0xFF30201D),
+                        side: const BorderSide(color: Color(0xFFE8C8C2)),
                         padding: const EdgeInsets.symmetric(vertical: 13),
                       ),
                     ),
@@ -186,7 +186,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 ),
                 const SizedBox(height: 16),
                 const Text('Вход и регистрация используют общую базу аккаунтов KAIRO. Google откроется в защищённом окне браузера.',
-                  textAlign: TextAlign.center, style: TextStyle(color: Color(0xFF94869F), fontSize: 11, height: 1.5)),
+                  textAlign: TextAlign.center, style: TextStyle(color: Color(0xFF927A75), fontSize: 11, height: 1.5)),
               ],
             ),
           ),
