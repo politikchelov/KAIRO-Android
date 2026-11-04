@@ -33,7 +33,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     color: _favPink,
     onRefresh: _load,
     child: _loading
-      ? const ListView(children: [SizedBox(height: 220), Center(child: CircularProgressIndicator(color: _favPink))])
+      ? ListView(children: const [SizedBox(height: 220), Center(child: CircularProgressIndicator(color: _favPink))])
       : _items.isEmpty
         ? ListView(children: const [
             SizedBox(height: 120),
