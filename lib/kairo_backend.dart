@@ -15,8 +15,8 @@ String kairoInternalEmail(String username) {
 
 Future<Map<String, dynamic>> kairoMyProfile() async {
   final user = kairoSupabase.auth.currentUser;
-  if (user == null) throw const AuthException('Сначала войди в аккаунт');
+  if (user == null) throw Exception('Сначала войди в аккаунт');
   final row = await kairoSupabase.from('profiles').select().eq('id', user.id).maybeSingle();
-  if (row == null) throw const AuthException('Профиль не найден');
+  if (row == null) throw Exception('Профиль не найден');
   return Map<String, dynamic>.from(row);
 }
