@@ -12,7 +12,7 @@ class _HistoryScreenState extends State<HistoryScreen>{
   bool _loading=true;
   @override
   void initState(){super.initState();_load();}
-  Future<void> _load() async {final v=await KairoLibrary.history();if(mounted)setState(()=>{_items=v,_loading=false});}
+  Future<void> _load() async {final v=await KairoLibrary.history();if(mounted)setState((){_items=v;_loading=false;});}
   Future<void> _clear() async {await KairoLibrary.clearHistory();if(mounted)setState(()=>_items=[]);}
   @override
   Widget build(BuildContext context)=>Scaffold(
