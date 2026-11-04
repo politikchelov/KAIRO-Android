@@ -61,7 +61,7 @@ class _KairoShellState extends State<KairoShell> {
   @override
   Widget build(BuildContext context) {
     final pages = <Widget>[
-      const _HomeScreen(),
+      _HomeScreen(onOpenCatalog: () => setState(() => _index = 1)),
       AnimeCatalogScreen(onOpenAnime: _openAnime),
       const _ComingSoonScreen(title: 'Чат', icon: Icons.forum_rounded,
         subtitle: 'Общение KAIRO появится здесь. Это отдельный экран приложения.'),
@@ -122,7 +122,8 @@ class _KairoShellState extends State<KairoShell> {
 }
 
 class _HomeScreen extends StatelessWidget {
-  const _HomeScreen();
+  const _HomeScreen({required this.onOpenCatalog});
+  final VoidCallback onOpenCatalog;
 
   @override
   Widget build(BuildContext context) => ListView(
@@ -162,7 +163,7 @@ class _HomeScreen extends StatelessWidget {
         icon: Icons.grid_view_rounded,
         title: 'Открыть каталог',
         subtitle: 'Поиск и подбор аниме',
-        onTap: () => (context.findAncestorStateOfType<_KairoShellState>()?._index = 1),
+        onTap: onOpenCatalog,
       ),
       const SizedBox(height: 10),
       const _InfoTile(
